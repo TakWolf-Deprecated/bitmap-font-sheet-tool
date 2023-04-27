@@ -165,13 +165,13 @@ def create_font_sheet(
     # 写入自定义格式元信息
     output_fnt_file_path = os.path.join(output_dir, f'{output_name}.fnt')
     with open(output_fnt_file_path, 'w', encoding='utf-8') as file:
-        file.write(f'fontSize:{meta_info["fontSize"]}\n')
-        file.write(f'ascent:{meta_info["ascent"]}\n')
-        file.write(f'descent:{meta_info["descent"]}\n')
-        file.write(f'lineGap:{meta_info["lineGap"]}\n')
-        file.write('# c:codePoint,x,y,width,height,offsetX,offsetY,advance\n')
+        file.write(f'* fontSize:{meta_info["fontSize"]}\n')
+        file.write(f'* ascent:{meta_info["ascent"]}\n')
+        file.write(f'* descent:{meta_info["descent"]}\n')
+        file.write(f'* lineGap:{meta_info["lineGap"]}\n')
+        file.write('# codePoint,x,y,width,height,offsetX,offsetY,advance\n')
         for code_point, info in meta_info['sprites'].items():
-            file.write(f'c:{code_point},{info["x"]},{info["y"]},{info["width"]},{info["height"]},{info["offsetX"]},{info["offsetY"]},{info["advance"]}\n')
+            file.write(f'{code_point},{info["x"]},{info["y"]},{info["width"]},{info["height"]},{info["offsetX"]},{info["offsetY"]},{info["advance"]}\n')
     logger.info(f'make {output_fnt_file_path}')
 
     # 写入图集
