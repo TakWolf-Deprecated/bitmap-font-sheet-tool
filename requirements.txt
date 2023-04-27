@@ -1,2 +1,4 @@
+Brotli==1.0.9
 fonttools==4.39.3
 Pillow==9.5.0
+pypng==0.20220715.0
