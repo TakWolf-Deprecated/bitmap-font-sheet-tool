@@ -21,8 +21,6 @@ def main():
         output_name='quan',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'quan', 'quan.ttf'),
-        offset_optimize=False,
-        safe_1px_edge=False,
     )
     font_service.create_font_sheet(
         font_size=12,
