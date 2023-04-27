@@ -170,6 +170,19 @@ def create_font_sheet(
         )
         logger.info(f'rasterize char: {code_point} - {chr(code_point)} size({glyph_width}, {glyph_height}) offset({glyph_offset_x}, {glyph_offset_y})')
 
+        # 如果没有像素
+        if glyph_width == 0 and glyph_height == 0:
+            meta_info['sprites'][str(code_point)] = {
+                'x': 0,
+                'y': 0,
+                'width': 0,
+                'height': 0,
+                'offsetX': 0,
+                'offsetY': 0,
+                'advance': advance_width,
+            }
+            continue
+
         # 调整现有图集尺寸来保证可以容纳新的字形
         new_sheet_width = sheet_cursor_x + glyph_width
         if safe_1px_edge:
