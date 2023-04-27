@@ -53,11 +53,11 @@ def create_font_sheet(
         output_name,
         output_dir,
         font_file_path,
-        sheet_max_width=1024,
-        offset_optimize=True,
-        safe_1px_edge=True,
-        binarize=False,
-        pretty_json=False,
+        sheet_max_width=1024,  # 图集纹理最大宽度
+        offset_optimize=True,  # 偏移优化，裁剪掉空白像素来减小纹理尺寸，使用时需要添加偏移量修正
+        safe_1px_edge=True,    # 在字形区域右下各添加 1 像素空白，来解决渲染时使用线性过滤算法造成的边缘颜色干扰问题
+        binarize=False,        # 二值化，转化某些非点阵字体时很有用，可以让其看起来具有像素风格。但是该算法比较粗暴。
+        pretty_json=False,     # 以较好的格式输出 json 文件
 ):
     # 加载字体文件
     font = TTFont(font_file_path)

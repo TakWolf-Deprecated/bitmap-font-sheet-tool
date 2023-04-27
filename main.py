@@ -50,6 +50,7 @@ def main():
         output_name='roboto',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'roboto', 'Roboto-Regular.ttf'),
+        binarize=True,
     )
 
 
