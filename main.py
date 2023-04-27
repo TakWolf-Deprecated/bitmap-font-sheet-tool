@@ -27,12 +27,14 @@ def main():
         output_name='fusion-pixel-monospaced',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'fusion-pixel-monospaced', 'fusion-pixel-monospaced.otf'),
+        binarize=True,
     )
     font_service.create_font_sheet(
         font_size=12,
         output_name='fusion-pixel-proportional',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'fusion-pixel-proportional', 'fusion-pixel-proportional.otf'),
+        binarize=True,
     )
     font_service.create_font_sheet(
         font_size=16,
