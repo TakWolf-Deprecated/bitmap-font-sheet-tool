@@ -42,8 +42,75 @@ def _rasterize_char(
 
     # 偏移优化
     if offset_optimize:
-        # TODO
-        pass
+        # 裁剪左侧
+        while True:
+            should_crop = True
+            if glyph_width > 0:
+                for glyph_bitmap_row in glyph_bitmap:
+                    _, _, _, alpha = glyph_bitmap_row[0]
+                    if alpha != 0:
+                        should_crop = False
+                        break
+            else:
+                should_crop = False
+            if should_crop:
+                for glyph_bitmap_row in glyph_bitmap:
+                    glyph_bitmap_row.pop(0)
+                glyph_width -= 1
+                glyph_offset_x += 1
+            else:
+                break
+
+        # 裁剪顶部
+        while True:
+            should_crop = True
+            if glyph_height > 0:
+                for _, _, _, alpha in glyph_bitmap[0]:
+                    if alpha != 0:
+                        should_crop = False
+                        break
+            else:
+                should_crop = False
+            if should_crop:
+                glyph_bitmap.pop(0)
+                glyph_height -= 1
+                glyph_offset_y += 1
+            else:
+                break
+
+        # 裁剪右侧
+        while True:
+            should_crop = True
+            if glyph_width > 0:
+                for glyph_bitmap_row in glyph_bitmap:
+                    _, _, _, alpha = glyph_bitmap_row[-1]
+                    if alpha != 0:
+                        should_crop = False
+                        break
+            else:
+                should_crop = False
+            if should_crop:
+                for glyph_bitmap_row in glyph_bitmap:
+                    glyph_bitmap_row.pop()
+                glyph_width -= 1
+            else:
+                break
+
+        # 裁剪底部
+        while True:
+            should_crop = True
+            if glyph_height > 0:
+                for _, _, _, alpha in glyph_bitmap[-1]:
+                    if alpha != 0:
+                        should_crop = False
+                        break
+            else:
+                should_crop = False
+            if should_crop:
+                glyph_bitmap.pop()
+                glyph_height -= 1
+            else:
+                break
 
     return glyph_bitmap, glyph_width, glyph_height, glyph_offset_x, glyph_offset_y
 
