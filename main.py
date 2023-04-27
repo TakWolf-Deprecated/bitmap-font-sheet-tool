@@ -21,7 +21,6 @@ def main():
         output_name='quan',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'quan', 'quan.ttf'),
-        pretty_json=True,
         offset_optimize=False,
         safe_1px_edge=False,
     )
@@ -50,6 +49,7 @@ def main():
         output_name='roboto',
         output_dir=build_dir,
         font_file_path=os.path.join(fonts_dir, 'roboto', 'Roboto-Regular.ttf'),
+        pretty_json=True,
         binarize=True,
     )
 
