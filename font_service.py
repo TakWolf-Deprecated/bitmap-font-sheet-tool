@@ -117,8 +117,8 @@ def _rasterize_char(
 
 def create_font_sheet(
         font_size,
-        output_name,
-        output_dir,
+        outputs_name,
+        outputs_dir,
         font_file_path,
         sheet_max_width=1024,  # 图集纹理最大宽度
         offset_optimize=True,  # 偏移优化，裁剪掉空白像素来减小纹理尺寸，使用时需要添加偏移量修正
@@ -128,20 +128,19 @@ def create_font_sheet(
 ):
     # 加载字体文件
     font = TTFont(font_file_path)
-    units_per_em = font['head'].unitsPerEm
-    px_units = units_per_em / font_size
-    hhea = font['hhea']
-    metrics = font['hmtx'].metrics
-    cmap = font.getBestCmap()
     image_font = ImageFont.truetype(font_file_path, font_size)
     logger.info(f'loaded font file: {font_file_path}')
+
+    # 计算字体参数
+    px_units = font['head'].unitsPerEm / font_size
+    line_height = math.ceil((font['hhea'].ascent - font['hhea'].descent) / px_units)
 
     # 字体元信息
     meta_info = {
         'fontSize': font_size,
-        'ascent': hhea.ascent / px_units,
-        'descent': hhea.descent / px_units,
-        'lineGap': hhea.lineGap / px_units,
+        'ascent': font['hhea'].ascent / px_units,
+        'descent': font['hhea'].descent / px_units,
+        'lineGap': font['hhea'].lineGap / px_units,
         'sprites': {},
     }
 
@@ -151,13 +150,17 @@ def create_font_sheet(
     sheet_width, sheet_height = 0, 0
 
     # 遍历字体全部字符
-    line_height = math.ceil(meta_info['ascent'] - meta_info['descent'])
-    for code_point, glyph_name in cmap.items():
-        advance_width = math.ceil(metrics[glyph_name][0] / px_units)
+    for code_point, glyph_name in font.getBestCmap().items():
+        c = chr(code_point)
+        if not c.isprintable():
+            continue
+
+        # 获取字符宽度
+        advance_width = math.ceil(font['hmtx'].metrics[glyph_name][0] / px_units)
         if advance_width > sheet_max_width:
             raise Exception('字形宽度大于图集最大宽度，无法容纳字形')
         if advance_width <= 0:
-            advance_width = font_size
+            continue
 
         # 栅格化
         glyph_bitmap, glyph_width, glyph_height, glyph_offset_x, glyph_offset_y = _rasterize_char(
@@ -232,19 +235,19 @@ def create_font_sheet(
             sheet_cursor_x += 1
 
     # 创建输出文件夹
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    if not os.path.exists(outputs_dir):
+        os.makedirs(outputs_dir)
 
     # 写入 json 元信息
-    output_json_file_path = os.path.join(output_dir, f'{output_name}.json')
-    with open(output_json_file_path, 'w', encoding='utf-8') as file:
+    json_file_path = os.path.join(outputs_dir, f'{outputs_name}.json')
+    with open(json_file_path, 'w', encoding='utf-8') as file:
         file.write(json.dumps(meta_info, indent=2 if pretty_json else None, ensure_ascii=False))
         file.write('\n')
-    logger.info(f'make {output_json_file_path}')
+    logger.info(f'make {json_file_path}')
 
     # 写入自定义格式元信息
-    output_fnt_file_path = os.path.join(output_dir, f'{output_name}.fnt')
-    with open(output_fnt_file_path, 'w', encoding='utf-8') as file:
+    fnt_file_path = os.path.join(outputs_dir, f'{outputs_name}.fnt')
+    with open(fnt_file_path, 'w', encoding='utf-8') as file:
         file.write(f'* fontSize:{meta_info["fontSize"]}\n')
         file.write(f'* ascent:{meta_info["ascent"]}\n')
         file.write(f'* descent:{meta_info["descent"]}\n')
@@ -252,19 +255,19 @@ def create_font_sheet(
         file.write('# codePoint,x,y,width,height,offsetX,offsetY,advance\n')
         for code_point, info in meta_info['sprites'].items():
             file.write(f'{code_point},{info["x"]},{info["y"]},{info["width"]},{info["height"]},{info["offsetX"]},{info["offsetY"]},{info["advance"]}\n')
-    logger.info(f'make {output_fnt_file_path}')
+    logger.info(f'make {fnt_file_path}')
 
     # 写入图集
-    output_png_file_path = os.path.join(output_dir, f'{output_name}.png')
-    output_bitmap = []
+    png_file_path = os.path.join(outputs_dir, f'{outputs_name}.png')
+    png_bitmap = []
     for sheet_bitmap_row in sheet_bitmap:
-        output_bitmap_row = []
+        png_bitmap_row = []
         for red, green, blue, alpha in sheet_bitmap_row:
-            output_bitmap_row.append(red)
-            output_bitmap_row.append(green)
-            output_bitmap_row.append(blue)
-            output_bitmap_row.append(alpha)
-        output_bitmap.append(output_bitmap_row)
-    image = png.from_array(output_bitmap, 'RGBA')
-    image.save(output_png_file_path)
-    logger.info(f'make {output_png_file_path}')
+            png_bitmap_row.append(red)
+            png_bitmap_row.append(green)
+            png_bitmap_row.append(blue)
+            png_bitmap_row.append(alpha)
+        png_bitmap.append(png_bitmap_row)
+    image = png.from_array(png_bitmap, 'RGBA')
+    image.save(png_file_path)
+    logger.info(f'make {png_file_path}')
