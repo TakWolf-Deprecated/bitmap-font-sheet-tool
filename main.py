@@ -50,6 +50,14 @@ def main():
         pretty_json=True,
         binarize=True,
     )
+    font_service.create_font_sheet(
+        font_size=30,
+        outputs_name='source-sans',
+        outputs_dir=build_dir,
+        font_file_path=os.path.join(fonts_dir, 'source-sans', 'SourceHanSans-Regular-SC.otf'),
+        sheet_max_width=4096,
+        pretty_json=True,
+    )
 
 
 if __name__ == '__main__':
